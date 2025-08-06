@@ -15,53 +15,58 @@ datasource db {
 }
 
 // Tabela Usuario
-model Usuario{
-  id Int @id @default(autoincrement())
-  nome String
-  email String @unique
-  senha String 
-  cargo String
+model Usuario {
+  id         Int          @id @default(autoincrement())
+  nome       String
+  email      String       @unique
+  senha      String
+  cargo      String
+  Prontuario Prontuario[]
+  Consulta   Consulta[]
 }
 
 model Prontuario {
-  id Int @id @default(autoincrement())
-  descricao String
-  date DateTime
+  id                    Int      @id @default(autoincrement())
+  descricao             String
+  date                  DateTime
   medico_responsavel_id Int
-  paciente_id Int
-  paciente_coluna Paciente @relation(fields: [paciente_id], references [id])
-  medico_coluna Usuario  @relation(fields: [medico_responsavel_id], references [id])
+  paciente_id           Int
+  paciente_coluna       Paciente @relation(fields: [paciente_id], references: [id])
+  medico_coluna         Usuario  @relation(fields: [medico_responsavel_id], references: [id])
 }
 
 model Consulta {
-  id Int @id @default(autoincrement())
-  motivo String
-  data DateTime
-  observacoes String
+  id                    Int      @id @default(autoincrement())
+  motivo                String
+  data                  DateTime
+  observacoes           String
   medico_responsavel_id Int
-  paciente_id Int
-  paciente_coluna Paciente @relation(fields: [paciente_id], references [id])
-  medico_coluna Usuario  @relation(fields: [medico_responsavel_id], references [id])
+  paciente_id           Int
+  paciente_coluna       Paciente @relation(fields: [paciente_id], references: [id])
+  medico_coluna         Usuario  @relation(fields: [medico_responsavel_id], references: [id])
 }
 
 model Paciente {
-  id Int @id @default(autoincrement())
-  nome String
-  cpf String
-  telefone Int
-  email String
+  id              Int          @id @default(autoincrement())
+  nome            String
+  cpf             String
+  telefone        Int
+  email           String
   data_nascimento DateTime
-  responsavel String?
-  sexo String
+  responsavel     String?
+  sexo            String
+  Prontuario      Prontuario[]
+  Consulta        Consulta[]
+  Exame           Exame[]
 }
 
 model Exame {
-  id Int @id @default(autoincrement())
-  tipo_exame String
-  resultado String
-  data_exame DateTime
-  link_arquino String
-  observacoes String
-  paciente_id Int
-  paciente_coluna Paciente @relation(fields: [paciente_id], references [id])
+  id              Int      @id @default(autoincrement())
+  tipo_exame      String
+  resultado       String
+  data_exame      DateTime
+  link_arquino    String
+  observacoes     String
+  paciente_id     Int
+  paciente_coluna Paciente @relation(fields: [paciente_id], references: [id])
 }
