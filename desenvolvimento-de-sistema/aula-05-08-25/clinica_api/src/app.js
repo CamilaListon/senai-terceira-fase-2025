@@ -1,16 +1,15 @@
 import express from 'express';
+import { prismaClient } from '../prisma/prisma.js';
 
 const app = express()
 
 app.use(express.json())
 
-app.use('/',(req, res)=>{
-    return res.json("Olá")
-})
+
 
 app.get('usuarios', async (req, res) => {
     try{
-        const usuarios = await Prisma.post.fundMany();
+        const usuarios = await prismaClient.usuario.fundMany();
         return res.json(usuarios)
     }
     catch (e){
