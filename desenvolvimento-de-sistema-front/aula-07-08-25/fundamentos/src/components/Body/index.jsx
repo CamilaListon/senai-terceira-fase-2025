@@ -1,3 +1,6 @@
+import styles from './body.module.css'
+import Card from "./Card"
+
 
 function Body() {
     const usuarios = [
@@ -8,10 +11,10 @@ function Body() {
 
 
     return (
-        <main className={StyleSheet.body}>
+        <main className={styles.body}>
             <h2>Usuarios Cadastrados:</h2>
-            <div className={StyleSheet.cardContainer}>
-
+            <div className={styles.cardContainer}>
+                <Card />
             </div>
 
         </main>

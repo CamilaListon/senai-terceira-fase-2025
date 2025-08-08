@@ -10,8 +10,8 @@ function App() {
   return (
     <>
       <Header titulo="Meu Titulo"/>
+      <Body/> 
       <Footer titulo="Criado Por Camila"/>
-      <Body/> <Card/>
       
     </>
   )
