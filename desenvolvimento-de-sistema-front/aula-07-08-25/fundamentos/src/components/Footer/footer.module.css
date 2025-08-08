@@ -1,0 +1,17 @@
+.header{
+    background-color:rgb(103, 9, 255);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid black;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    font-family: "Delius", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.title{
+    color: #000000;
+}
