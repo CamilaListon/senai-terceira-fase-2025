@@ -55,30 +55,37 @@ app.put("/usuarios/:id", async (req, res) => {
     try {
         const { body, params } = req
 
-        await prismaClient.usuario.update({
-            where: { id: Number(params.id) },
-            data: {
-                ...body
-            },
-        })
+        if (body.nome || body.cargo || body.email || body.senha) {
 
-        const usuarioAtualizado = await prismaClient.usuario.findUnique({
-            where: {
-                id: Number(params.id)
-            }
-        })
+            await prismaClient.usuario.update({
+                where: { id: Number(params.id) },
+                data: {
+                    ...body
+                },
+            })
 
-        res.status(201).json({
-            message: "Usuário atualizado!",
-            data: usuarioAtualizado
-        })
+            const usuarioAtualizado = await prismaClient.usuario.findUnique({
+                where: {
+                    id: Number(params.id)
+                }
+            })
+
+            res.status(201).json({
+                message: "Usuário atualizado!",
+                data: usuarioAtualizado
+            })
+        }else
 
     } catch (error) {
         console.log(error)
+        if (error.code == "p2025") {
+            res.status(404).send("Usuario não existe no banco")
+        }
         if (error.code === "P2002") {
             res.status(404).send("Falha ao cadastrar usuário: Email já cadastrado!")
         }
     }
+
 })
 
 app.listen(3000, () => console.log("Api rodando"))
