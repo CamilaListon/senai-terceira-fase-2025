@@ -53,7 +53,7 @@ CREATE TABLE `Exame` (
     `tipo_exame` VARCHAR(191) NOT NULL,
     `resultado` VARCHAR(191) NOT NULL,
     `data_exame` DATETIME(3) NOT NULL,
-    `link_arquino` VARCHAR(191) NOT NULL,
+    `link_arquivo` VARCHAR(191) NOT NULL,
     `observacoes` VARCHAR(191) NOT NULL,
     `paciente_id` INTEGER NOT NULL,
 
