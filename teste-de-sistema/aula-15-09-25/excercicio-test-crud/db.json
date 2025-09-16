@@ -1,0 +1,35 @@
+{
+  "equipamentos": [
+    {
+      "id": 1,
+      "nome": "Projetor",
+      "status": "ativo"
+    },
+    {
+      "id": 2,
+      "nome": "Tablet",
+      "status": "inativo"
+    },
+    {
+      "id": 2,
+      "nome": "Celular",
+      "status": "ativo"
+    },
+    {
+      "id": 2,
+      "nome": "Relogio",
+      "status": "inativo"
+    },
+    {
+      "nome": "Monitor",
+      "status": "ativo",
+      "id": 3,
+      "hack": "injetado"
+    },
+    {
+      "nome": "Scanner",
+      "status": "ativo",
+      "id": 4
+    }
+  ]
+}
