@@ -35,6 +35,27 @@ class UsuarioController {
             console.log(e)
         }
     }
+
+
+// ********
+    async getUsuarioPorEmail(req, res) {
+        try {
+            const { params } = req
+            const usuario = await prismaClient.usuario.findUnique({
+                where: {
+                    email: string(params.email)
+                }
+            })
+            if (!usuario) return res.status(404).send("Usuário não existe!")
+            return res.json(usuario)
+        }
+        catch (e) {
+            console.log(e)
+        }
+    }
+// ********
+
+
     async criarUsuario(req, res) {
         try {
             const { body } = req
