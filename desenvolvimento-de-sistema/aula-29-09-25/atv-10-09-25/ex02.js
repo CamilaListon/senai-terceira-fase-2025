@@ -32,3 +32,20 @@ class Queue {
   console.log(queue.dequeue());
   console.log(queue.front()); 
   console.log(queue.size());
+
+  // -- Correção atv
+
+  function enqueue(queue, value){
+    return queue.push(value);
+  }
+
+  function dequeue(queue){
+    if (queue.length === 0) return;
+    return queue.shift();
+
+  }
+
+  function front(queue){
+    if (queue.length === 0) return;
+    return queue[0];
+}

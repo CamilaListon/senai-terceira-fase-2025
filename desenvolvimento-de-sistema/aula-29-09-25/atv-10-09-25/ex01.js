@@ -30,3 +30,19 @@ stack.push(27);
 console.log(stack.peek());
 console.log(stack.pop());
 stack.print();
+
+// - Correção atv
+
+function push(stack, value){
+    return stack.push(value)
+}
+
+function pop(stack){
+    if (stack.length === 0) return;
+    return stack.pop();
+}
+
+function peek(stack) {
+    if(stack.length === 0) return;
+    return stack[stack.length - 1]
+}
