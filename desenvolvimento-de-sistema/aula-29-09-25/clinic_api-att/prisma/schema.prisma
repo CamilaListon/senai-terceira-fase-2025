@@ -16,6 +16,7 @@ model Usuario {
   senha      String
   cargo      String
   Prontuario Prontuario[]
+  token      Token[]
 
   @@map("usuario")
 }
@@ -71,4 +72,16 @@ model Exame {
   paciente     Paciente @relation(fields: [paciente_id], references: [id])
 
   @@map("exame")
+}
+
+model Token {
+  id           Int      @id @default(autoincrement())
+  token        String   @db.varchar(256) 
+  type         String
+  usuarioId    Int
+  revoked      Boolean @default(value:false) 
+  expireAst    DateTime
+  usuario      Usuario   @relation(fields: [usuario_id], references: [id])
+
+   @@map("token")
 }
