@@ -2,6 +2,9 @@ import { useState } from "react"
 import { useAuth } from "../../contexts/AuthContext"
 import axios from "axios"
 import { toast } from "react-toastify"
+import { useNavigate } from "react-router"
+import Modal from "../Modal/Modal"
+import RegisterUser from "../RegisterUser/RegisterUser"
 
 
 const LoginForm = () => {
@@ -9,6 +12,10 @@ const LoginForm = () => {
     const [password, setPassword] = useState("")
     //contexto
     const { login } = useAuth()
+    //rotas com react route
+    const navigate = useNavigate()
+    //modal
+    const [isModalOpen, setIsModalOpen] = useState(false)
 
     //função validação do login
 
@@ -20,26 +27,32 @@ const LoginForm = () => {
                 params: { email, password }
             })
 
-
             // console.log(response)
 
             if (response.data.length === 0) {
                 console.log("usuário não encontrado")
-                toast.error('Usuário não encontrado, verifique o email e senha',{
-                    autoClose:3000,
-                    hideProgressBar:true
+                toast.error('Usuário não encontrado, verifique o email e senha', {
+                    autoClose: 3000,
+                    hideProgressBar: true
                 })
                 return
             }
 
             login(email)
-            toast.success("Login realizado com sucesso!",{
-                autoClose:3000,
-                hideProgressBar:true
+            toast.success("Login realizado com sucesso!", {
+                autoClose: 3000,
+                hideProgressBar: true
             })
 
+            setTimeout(() => navigate('/dashboard'), 2000)
+
         }
-        catch {
+        catch (erros) {
+            console.error('Erro ao verificar o usuario')
+            toast.error('Erro ao conectar com o servidor', {
+                autoClose: 3000,
+                hideProgressBar: true
+            })
 
         }
     }
@@ -77,14 +90,18 @@ const LoginForm = () => {
                 </div>
 
                 <button type="submit"
-                    className="w-full bg-cyan-700 text-white p-2 rounded-lg hover:bg-cyan-800 transition-colors">Entrar</button>
+                    className="w-full bg-cyan-700 text-white p-2 rounded-lg hover:bg-cyan-800 transition-colors cursor-pointer">Entrar</button>
             </form>
 
-            <div className="flex justify-between mt-4 text-sm">
-                <button>Esqueceu sua senha?</button>
-                <button>Criar conta</button>
+            <div className="flex justify-between mt-4 text-sm ">
+                <button className="cursor-pointer">Esqueceu sua senha?</button>
+                <button className="cursor-pointer" onClick={() => setIsModalOpen(true)}>Criar conta</button>
             </div>
 
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                <h1>Conteudo Modal</h1>
+                <RegisterUser />
+            </Modal>
         </div>
     )
 }
