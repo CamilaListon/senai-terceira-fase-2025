@@ -1,14 +1,34 @@
 {
-    "users": [
-        {
-            "id": 1,
-            "email": "joao@email.com",
-            "password": "123456789"
-        },
-        {
-            "id": 2,
-            "email": "maria@email.com",
-            "password": "123456789"
-        }
-    ]
+  "users": [
+    {
+      "id": 1,
+      "email": "joao@email.com",
+      "password": "123456789"
+    },
+    {
+      "id": 2,
+      "email": "maria@email.com",
+      "password": "123456789"
+    },
+    {
+      "email": "camila@email.com",
+      "password": "123456789",
+      "id": 3
+    },
+    {
+      "email": "carlos@email.com",
+      "password": "123456789",
+      "id": 4
+    },
+    {
+      "email": "camila@email.com",
+      "password": "qweqweqweqwe",
+      "id": 5
+    },
+    {
+      "email": "camila5@email.com",
+      "password": "qweqweqwe",
+      "id": 6
+    }
+  ]
 }

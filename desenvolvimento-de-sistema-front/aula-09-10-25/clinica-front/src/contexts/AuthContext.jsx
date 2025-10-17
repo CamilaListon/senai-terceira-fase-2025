@@ -5,7 +5,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 const AuthContext = createContext()
 
 export const Authprovider = ({ children }) => {
-    const [user, setUser] = useState("")
+    const [user, setUser] = useState(" ")
 
     // se ja tiver email no localstorage, mantém login
 
