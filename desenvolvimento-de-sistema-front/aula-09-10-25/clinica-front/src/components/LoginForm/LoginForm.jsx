@@ -18,7 +18,7 @@ const LoginForm = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
 
     useEffect(() => {
-        if(user){
+        if (user) {
             navigate('/dashboard')
         }
     }, [user, navigate])
@@ -29,11 +29,14 @@ const LoginForm = () => {
         e.preventDefault()
 
         try {
-            const response = await axios.get('http://localhost:3000/users', {
-                params: { email, password }
-            })
+            const data = {
+                email: email,
+                senha: password
+            }
 
-            // console.log(response)
+            const response = await axios.post('http://localhost:4000/auth/login', data)
+
+            console.log(response)
 
             if (response.data.length === 0) {
                 console.log("usuário não encontrado")
