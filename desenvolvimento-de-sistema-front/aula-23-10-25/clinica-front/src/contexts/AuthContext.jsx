@@ -1,11 +1,10 @@
 
 import { createContext, useContext, useState, useEffect } from 'react'
 
-
 const AuthContext = createContext()
 
 export const Authprovider = ({ children }) => {
-    const [user, setUser] = useState(" ")
+    const [user, setUser] = useState("")
 
     // se ja tiver email no localstorage, mantém login
 
@@ -25,6 +24,7 @@ export const Authprovider = ({ children }) => {
         localStorage.removeItem("email")
         setUser("")
     }
+
 
     return (
         <AuthContext Provider value={{ user, login, logout }}>
