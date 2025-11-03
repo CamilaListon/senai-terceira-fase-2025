@@ -1,5 +1,4 @@
 // Controller
-
 import { prismaClient } from "../../../prisma/prisma.js";
 import { getToken } from "../../utils/jwt.js";
 
@@ -10,10 +9,10 @@ class ProntuarioController {
         try {
             const { query } = req
             const prontuarios = await prismaClient.prontuario.findMany({
-                where: {
-                    data: {
-                        let: query.dataFinal ? new Date(query.dataFinal) : undefined,
-                        get: query.dataInicio ? new Date(query.dataInicio) : undefined
+                where:{
+                    data:{
+                        lte: query.dataFinal ?  new Date(query.dataFinal) : undefined,
+                        gte: query.dataInicio ? new Date(query.dataInicio) : undefined
                     },
                     paciente: {
                         nome: query.paciente
@@ -28,12 +27,12 @@ class ProntuarioController {
     }
     async pegarProntuarioPorID(req, res) {
         try {
-            // const { params } = req;
             const prontuario = await prismaClient.prontuario.findUnique({
                 where: {
-                    id: Number(req.params.id)
+                    id: Number(req.params.id),
                 }
             });
+
             if (!prontuario) {
                 res.status(404).send("Erro ao procurar o prontuario com o id informado")
             }
@@ -45,6 +44,7 @@ class ProntuarioController {
     async criarProntuario(req, res) {
         try {
             const { body } = req
+            const token = getToken(req.headers.authorization);
 
             const bodyKeys = Object.keys(body)
             for (const key of bodyKeys) {
@@ -56,7 +56,7 @@ class ProntuarioController {
             const prontuario = await prismaClient.prontuario.create({
                 data: {
                     ...body,
-
+                    medico_responsavel_id: token.userId,
                     data: new Date(body.data) // corrigir esse cara no put quando nao se manda ele... TO-DO
                 },
             })

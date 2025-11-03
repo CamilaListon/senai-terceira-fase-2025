@@ -11,7 +11,7 @@ import { exameRouter } from "./routes/exame.js";
 import authRouter from "./routes/authRoutes.js";
 import { auth } from "./middleware/auth.js";
 
-const app = express();
+export const app = express();
 
 // Middlewares globais
 app.use(cors()); 
@@ -33,5 +33,5 @@ app.use(pacientesRouter);
 app.use(prontuarioRouter);
 app.use(consultasRouter);
 
-const port = 4000;
-app.listen(port, () => console.log(`Api rodando na porta ${port}`));
+// const port = 3000;
+// app.listen(port, () => console.log(`Api rodando na porta ${port}`));
