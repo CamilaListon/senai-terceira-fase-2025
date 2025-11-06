@@ -1,13 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
+import { IMaskInput } from "react-imask";
 
-// Classe de estilo reutilizável para campos de input e select (Tailwind CSS)
-const inputClass = "w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500";
-const labelClass = "block text-sm font-medium text-gray-700";
-const gridContainerClass = "grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4";
-const sidebarItemClass = "p-3 flex items-center text-white cursor-pointer hover:bg-teal-700 transition-colors";
-
-function PatientRegistrationForm() {
-    // Estado inicial com os dados fornecidos pelo usuário
+const RegisterFormPatient = () => {
     const [formData, setFormData] = useState({
         fullName: "",
         gender: "",
@@ -36,199 +33,417 @@ function PatientRegistrationForm() {
         },
     });
 
-    // Função de tratamento de mudança para campos do formulário
-    const handleChange = (e) => {
+    const [isSaving, setIsSaving] = useState(false);
+
+    // --- HANDLERS ---
+    const handleInputChange = (e) => {
         const { name, value } = e.target;
-        // Verifica se o campo pertence ao objeto 'address'
-        if (Object.keys(formData.address).includes(name)) {
-            setFormData(prev => ({
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleAddressChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            address: { ...prev.address, [name]: value },
+        }));
+    };
+
+    const fetchAddressData = async (cep) => {
+        try {
+            const { data } = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+            setFormData((prev) => ({
                 ...prev,
                 address: {
                     ...prev.address,
-                    [name]: value
-                }
+                    cep: data.cep || "",
+                    city: data.localidade || "",
+                    state: data.uf || "",
+                    street: data.logradouro || "",
+                    complement: data.complemento || "",
+                    neighborhood: data.bairro || "",
+                },
             }));
-        } else {
-            // Se for um campo de nível superior
-            setFormData(prev => ({ ...prev, [name]: value }));
+        } catch (error) {
+            console.error("Erro ao buscar endereço:", error);
         }
     };
 
-    // Função de tratamento de envio do formulário
-    const handleSubmit = (e) => {
+    const handleCepBlur = (e) => {
+        const cep = e.target.value.replace(/\D/g, "");
+        if (cep.length === 8) fetchAddressData(cep);
+    };
+
+    // --- SUBMIT ---
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Dados a serem salvos:", formData);
-        alert("Formulário de cadastro (simulado) enviado! Verifique o console para os dados.");
-        // Aqui você faria a chamada à API para salvar os dados
+        setIsSaving(true);
+
+        try {
+            await axios.post("http://localhost:3000/patients", formData);
+
+            toast.success("Paciente cadastrado com sucesso!", {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: true,
+            });
+
+            setFormData({
+                fullName: "",
+                gender: "",
+                birthdate: "",
+                cpf: "",
+                rg: "",
+                maritalStatus: "",
+                phone: "",
+                email: "",
+                birthplace: "",
+                emergencyContact: "",
+                allergies: "",
+                specialCare: "",
+                healthInsurance: "",
+                insuranceNumber: "",
+                insuranceValidity: "",
+                address: {
+                    cep: "",
+                    city: "",
+                    state: "",
+                    street: "",
+                    number: "",
+                    complement: "",
+                    neighborhood: "",
+                    reference: "",
+                },
+            });
+        } catch (error) {
+            toast.error("Erro ao salvar os dados!", {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: true,
+            });
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
-        <div className="flex min-h-screen">
+        <form
+            onSubmit={handleSubmit}
+            className="space-y-6 text-gray-800"
+            autoComplete="off"
+        >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-            {/* Conteúdo Principal / Formulário */}
-            <div className="flex-grow p-8">
-                <h1 className="text-2xl font-bold mb-6 text-gray-800">Cadastro de Paciente</h1>
+                {/* Nome Completo */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Nome Completo</label>
+                    <input
+                        type="text"
+                        name="fullName"
+                        value={formData.fullName}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none"
+                    />
+                </div>
 
-                <form className="bg-white p-6 rounded-lg shadow-xl" onSubmit={handleSubmit}>
+                {/* Gênero */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Gênero</label>
+                    <select
+                        name="gender"
+                        value={formData.gender}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none"
+                    >
+                        <option value="">Selecione</option>
+                        <option value="masculino">Masculino</option>
+                        <option value="feminino">Feminino</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
 
-                    {/* Informações Pessoais */}
-                    <fieldset className="mb-8 pb-4 border-b border-gray-200">
-                        <legend className="text-lg font-semibold mb-4 text-teal-800">Dados Pessoais</legend>
-                        <div className={gridContainerClass}>
+                {/* Data de Nascimento */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Data de Nascimento</label>
+                    <input
+                        type="date"
+                        name="birthdate"
+                        value={formData.birthdate}
+                        onChange={handleInputChange}
+                        className="w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none"
+                    />
+                </div>
 
-                            {/* Nome Completo / Gênero */}
-                            <div>
-                                <label htmlFor="fullName" className={labelClass}>Nome Completo</label>
-                                <input type="text" id="fullName" name="fullName" value={formData.fullName} onChange={handleChange} className={inputClass} required />
-                            </div>
-                            <div>
-                                <label htmlFor="gender" className={labelClass}>Gênero</label>
-                                <select id="gender" name="gender" value={formData.gender} onChange={handleChange} className={inputClass} required>
-                                    <option value="">Selecione</option>
-                                    <option value="Masculino">Masculino</option>
-                                    <option value="Feminino">Feminino</option>
-                                    <option value="Outro">Outro</option>
-                                </select>
-                            </div>
+                {/* CPF */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">CPF</label>
+                    <IMaskInput
+                        mask="000.000.000-00"
+                        name="cpf"
+                        value={formData.cpf}
+                        onAccept={(value) => setFormData((prev) => ({ ...prev, cpf: value }))}
+                        className="w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none"
+                        required
+                    />
+                </div>
 
-                            {/* Data de Nascimento / CPF */}
-                            <div>
-                                <label htmlFor="birthdate" className={labelClass}>Data de Nascimento</label>
-                                <input type="date" id="birthdate" name="birthdate" value={formData.birthdate} onChange={handleChange} className={inputClass} required />
-                            </div>
-                            <div>
-                                <label htmlFor="cpf" className={labelClass}>CPF</label>
-                                <input type="text" id="cpf" name="cpf" value={formData.cpf} onChange={handleChange} className={inputClass} required />
-                            </div>
+                {/* RG */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">RG</label>
+                    <input
+                        type="text"
+                        name="rg"
+                        value={formData.rg}
+                        onChange={handleInputChange}
+                        className="w-full border p-2 rounded-lg"
+                        required
+                    />
+                </div>
 
-                            {/* RG / Estado Civil */}
-                            <div>
-                                <label htmlFor="rg" className={labelClass}>RG</label>
-                                <input type="text" id="rg" name="rg" value={formData.rg} onChange={handleChange} className={inputClass} />
-                            </div>
-                            <div>
-                                <label htmlFor="maritalStatus" className={labelClass}>Estado Civil</label>
-                                <select id="maritalStatus" name="maritalStatus" value={formData.maritalStatus} onChange={handleChange} className={inputClass}>
-                                    <option value="">Selecione</option>
-                                    <option value="Solteiro">Solteiro</option>
-                                    <option value="Casado">Casado</option>
-                                    <option value="Divorciado">Divorciado</option>
-                                    <option value="Viúvo">Viúvo</option>
-                                </select>
-                            </div>
+                {/* Estado Civil */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Estado Civil</label>
+                    <select
+                        name="maritalStatus"
+                        value={formData.maritalStatus}
+                        onChange={handleInputChange}
+                        className="w-full border p-2 rounded-lg"
+                        required
+                    >
+                        <option value="">Selecione</option>
+                        <option value="solteiro(a)">Solteiro(a)</option>
+                        <option value="casado(a)">Casado(a)</option>
+                        <option value="divorciado(a)">Divorciado(a)</option>
+                        <option value="viuvo(a)">Viúvo(a)</option>
+                    </select>
+                </div>
 
-                            {/* Telefone / Contato de Emergência */}
-                            <div>
-                                <label htmlFor="phone" className={labelClass}>Telefone</label>
-                                <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} className={inputClass} />
-                            </div>
-                            <div>
-                                <label htmlFor="emergencyContact" className={labelClass}>Contato de Emergência</label>
-                                <input type="tel" id="emergencyContact" name="emergencyContact" value={formData.emergencyContact} onChange={handleChange} className={inputClass} />
-                            </div>
+                {/* Telefone */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Telefone</label>
+                    <IMaskInput
+                        mask="(00) 00000-0000"
+                        name="phone"
+                        value={formData.phone}
+                        onAccept={(value) => setFormData((prev) => ({ ...prev, phone: value }))}
+                        className="w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none"
+                    />
+                </div>
 
-                            {/* E-mail / Naturalidade */}
-                            <div>
-                                <label htmlFor="email" className={labelClass}>E-mail</label>
-                                <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} className={inputClass} />
-                            </div>
-                            <div>
-                                <label htmlFor="birthplace" className={labelClass}>Naturalidade</label>
-                                <input type="text" id="birthplace" name="birthplace" value={formData.birthplace} onChange={handleChange} className={inputClass} />
-                            </div>
-                        </div>
-                    </fieldset>
+                {/* Contato de Emergência */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Contato de Emergência</label>
+                    <IMaskInput
+                        mask="(00) 00000-0000"
+                        name="emergencyContact"
+                        value={formData.emergencyContact}
+                        onAccept={(value) =>
+                            setFormData((prev) => ({ ...prev, emergencyContact: value }))
+                        }
+                        className="w-full border p-2 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none"
+                    />
+                </div>
 
-                    {/* Informações Médicas e Convênio */}
-                    <fieldset className="mb-8 pb-4 border-b border-gray-200">
-                        <legend className="text-lg font-semibold mb-4 text-teal-800">Informações Adicionais</legend>
-                        <div className={gridContainerClass}>
-                            {/* Alergias / Cuidados Especiais */}
-                            <div>
-                                <label htmlFor="allergies" className={labelClass}>Alergias</label>
-                                <input type="text" id="allergies" name="allergies" value={formData.allergies} onChange={handleChange} className={inputClass} />
-                            </div>
-                            <div>
-                                <label htmlFor="specialCare" className={labelClass}>Cuidados Especiais</label>
-                                <input type="text" id="specialCare" name="specialCare" value={formData.specialCare} onChange={handleChange} className={inputClass} />
-                            </div>
+                {/* Email */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">E-mail</label>
+                    <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className="w-full border p-2 rounded-lg"
+                    />
+                </div>
 
-                            {/* Convênio / Número do Convênio */}
-                            <div>
-                                <label htmlFor="healthInsurance" className={labelClass}>Convênio</label>
-                                <input type="text" id="healthInsurance" name="healthInsurance" value={formData.healthInsurance} onChange={handleChange} className={inputClass} />
-                            </div>
-                            <div>
-                                <label htmlFor="insuranceNumber" className={labelClass}>Número do Convênio</label>
-                                <input type="text" id="insuranceNumber" name="insuranceNumber" value={formData.insuranceNumber} onChange={handleChange} className={inputClass} />
-                            </div>
+                {/* Naturalidade */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Naturalidade</label>
+                    <input
+                        type="text"
+                        name="birthplace"
+                        value={formData.birthplace}
+                        onChange={handleInputChange}
+                        className="w-full border p-2 rounded-lg"
+                    />
+                </div>
 
-                            {/* Validade do Convênio / CEP */}
-                            <div>
-                                <label htmlFor="insuranceValidity" className={labelClass}>Validade do Convênio</label>
-                                <input type="date" id="insuranceValidity" name="insuranceValidity" value={formData.insuranceValidity} onChange={handleChange} className={inputClass} />
-                            </div>
-                            <div>
-                                <label htmlFor="cep" className={labelClass}>CEP</label>
-                                <input type="text" id="cep" name="cep" value={formData.address.cep} onChange={handleChange} className={inputClass} />
-                            </div>
-                        </div>
-                    </fieldset>
+                {/* Alergias */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Alergias</label>
+                    <input
+                        type="text"
+                        name="allergies"
+                        value={formData.allergies}
+                        onChange={handleInputChange}
+                        className="w-full border p-2 rounded-lg"
+                    />
+                </div>
 
-                    {/* Endereço */}
-                    <fieldset>
-                        <legend className="text-lg font-semibold mb-4 text-teal-800">Endereço</legend>
-                        <div className={gridContainerClass}>
-                            {/* Rua / Número */}
-                            <div>
-                                <label htmlFor="street" className={labelClass}>Rua</label>
-                                <input type="text" id="street" name="street" value={formData.address.street} onChange={handleChange} className={inputClass} />
-                            </div>
-                            <div>
-                                <label htmlFor="number" className={labelClass}>Número</label>
-                                <input type="text" id="number" name="number" value={formData.address.number} onChange={handleChange} className={inputClass} />
-                            </div>
+                {/* Cuidados Especiais */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Cuidados Especiais</label>
+                    <input
+                        type="text"
+                        name="specialCare"
+                        value={formData.specialCare}
+                        onChange={handleInputChange}
+                        className="w-full border p-2 rounded-lg"
+                    />
+                </div>
 
-                            {/* Referência / Complemento */}
-                            <div>
-                                <label htmlFor="reference" className={labelClass}>Referência</label>
-                                <input type="text" id="reference" name="reference" value={formData.address.reference} onChange={handleChange} className={inputClass} />
-                            </div>
-                            <div>
-                                <label htmlFor="complement" className={labelClass}>Complemento</label>
-                                <input type="text" id="complement" name="complement" value={formData.address.complement} onChange={handleChange} className={inputClass} />
-                            </div>
+                {/* Convênio */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Convênio</label>
+                    <input
+                        type="text"
+                        name="healthInsurance"
+                        value={formData.healthInsurance}
+                        onChange={handleInputChange}
+                        className="w-full border p-2 rounded-lg"
+                    />
+                </div>
 
-                            {/* Bairro / Cidade */}
-                            <div>
-                                <label htmlFor="neighborhood" className={labelClass}>Bairro</label>
-                                <input type="text" id="neighborhood" name="neighborhood" value={formData.address.neighborhood} onChange={handleChange} className={inputClass} />
-                            </div>
-                            <div>
-                                <label htmlFor="city" className={labelClass}>Cidade</label>
-                                <input type="text" id="city" name="city" value={formData.address.city} onChange={handleChange} className={inputClass} />
-                            </div>
+                {/* Número do Convênio */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Número do Convênio</label>
+                    <input
+                        type="text"
+                        name="insuranceNumber"
+                        value={formData.insuranceNumber}
+                        onChange={handleInputChange}
+                        className="w-full border p-2 rounded-lg"
+                    />
+                </div>
 
-                            {/* Estado (Campo único, span-col-2) */}
-                            <div className="col-span-1 md:col-span-2">
-                                <label htmlFor="state" className={labelClass}>Estado</label>
-                                <input type="text" id="state" name="state" value={formData.address.state} onChange={handleChange} className={inputClass} />
-                            </div>
-                        </div>
-                    </fieldset>
+                {/* Validade do Convênio */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Validade do Convênio</label>
+                    <input
+                        type="date"
+                        name="insuranceValidity"
+                        value={formData.insuranceValidity}
+                        onChange={handleInputChange}
+                        className="w-full border p-2 rounded-lg"
+                    />
+                </div>
 
-                    {/* Botão Salvar */}
-                    <div className="flex justify-end mt-8 pt-4 border-t border-gray-200">
-                        <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-md transition-colors shadow-md">
-                            Salvar
-                        </button>
-                    </div>
+                {/* CEP */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">CEP</label>
+                    <IMaskInput
+                        mask="00000-000"
+                        name="cep"
+                        value={formData.address.cep}
+                        onAccept={(value) => handleAddressChange({ target: { name: "cep", value } })}
+                        onBlur={handleCepBlur}
+                        className="w-full border p-2 rounded-lg"
+                    />
+                </div>
 
-                </form>
+                {/* Rua */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Rua</label>
+                    <input
+                        type="text"
+                        name="street"
+                        value={formData.address.street}
+                        onChange={handleAddressChange}
+                        className="w-full border p-2 rounded-lg"
+                    />
+                </div>
+
+                {/* Número */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Número</label>
+                    <input
+                        type="text"
+                        name="number"
+                        value={formData.address.number}
+                        onChange={handleAddressChange}
+                        className="w-full border p-2 rounded-lg"
+                    />
+                </div>
+
+                {/* Referência */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Referência</label>
+                    <input
+                        type="text"
+                        name="reference"
+                        value={formData.address.reference}
+                        onChange={handleAddressChange}
+                        className="w-full border p-2 rounded-lg"
+                    />
+                </div>
+
+                {/* Complemento */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Complemento</label>
+                    <input
+                        type="text"
+                        name="complement"
+                        value={formData.address.complement}
+                        onChange={handleAddressChange}
+                        className="w-full border p-2 rounded-lg"
+                    />
+                </div>
+
+                {/* Bairro */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Bairro</label>
+                    <input
+                        type="text"
+                        name="neighborhood"
+                        value={formData.address.neighborhood}
+                        onChange={handleAddressChange}
+                        className="w-full border p-2 rounded-lg"
+                    />
+                </div>
+
+                {/* Cidade */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Cidade</label>
+                    <input
+                        type="text"
+                        name="city"
+                        value={formData.address.city}
+                        onChange={handleAddressChange}
+                        className="w-full border p-2 rounded-lg"
+                    />
+                </div>
+
+                {/* Estado */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Estado</label>
+                    <input
+                        type="text"
+                        name="state"
+                        value={formData.address.state}
+                        onChange={handleAddressChange}
+                        className="w-full border p-2 rounded-lg"
+                    />
+                </div>
+
+
             </div>
-        </div>
-    );
-}
 
-// Exporta o componente
-export default PatientRegistrationForm;
+            {/* Botão de envio */}
+            <div className="flex justify-end gap-3 pt-4">
+                <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="px-4 py-2 bg-cyan-700 text-white rounded-lg hover:bg-cyan-600 disabled:opacity-50"
+                >
+                    {isSaving ? "Salvando..." : "Salvar"}
+                </button>
+            </div>
+
+            <ToastContainer />
+        </form>
+    );
+};
+
+export default RegisterFormPatient;
