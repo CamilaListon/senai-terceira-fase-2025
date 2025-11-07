@@ -11,6 +11,7 @@
     "server": "npx json-server src/services/db.json"
   },
   "dependencies": {
+    "@google/gemini-cli": "^0.12.0",
     "@tailwindcss/vite": "^4.1.13",
     "axios": "^1.12.2",
     "json-server": "^0.16.1",

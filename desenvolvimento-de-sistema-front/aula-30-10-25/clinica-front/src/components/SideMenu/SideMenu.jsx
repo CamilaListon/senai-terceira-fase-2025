@@ -23,7 +23,7 @@ const SideMenu = () => {
 
 
     return (
-        <aside className={`h-screen bg-cyan-800 text-white flex flex-col justify-between transition-all duration-300
+        <aside className={`bg-cyan-800 text-white flex flex-col justify-between transition-all duration-300
         ${isCollapsed ? "w-20" : "w-64"}`}>
 
 
