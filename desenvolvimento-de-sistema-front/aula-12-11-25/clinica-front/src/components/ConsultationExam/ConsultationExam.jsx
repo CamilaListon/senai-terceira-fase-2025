@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { toast, ToastContainer } from 'react-toastify'
-
-//importa o component modal
-
 import Modal from "../Modal/Modal"
 
-const ConsultationForm = () => {
+const ConsultationExam = () => {
 
-  //variaveis e estados
+  // estados
   const [searchTerm, setSearchTerm] = useState('')
   const [patients, setPatients] = useState([])
   const [selectedPatient, setSelectedPatient] = useState(null)
@@ -16,16 +13,16 @@ const ConsultationForm = () => {
   const [isSaving, setIsSaving] = useState(false)
 
   const [formData, setFormData] = useState({
-    reason: "",
+    name: "",
     date: "",
     time: "",
-    description: "",
-    medication: "",
-    dosagemPrecaution: ""
+    type: "",
+    laboratory: "",
+    documentUrl: "",
+    results: ""
   })
 
-  //busca pacientes
-
+  // busca pacientes
   const fetchPatients = async () => {
     try {
       const response = await axios.get("http://localhost:3000/patients")
@@ -39,11 +36,9 @@ const ConsultationForm = () => {
     fetchPatients()
   }, [])
 
-  //funções auxiliares - Helpers
-
+  // filtro
   const handleSearchChange = (e) => setSearchTerm(e.target.value)
 
-  //filtro de pacientes
   const filteredPatients = patients.filter(
     (patient) =>
       patient.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -67,19 +62,17 @@ const ConsultationForm = () => {
 
   const resetForm = () => {
     setFormData({
-      reason: "",
+      name: "",
       date: "",
       time: "",
-      description: "",
-      medication: "",
-      dosagemPrecaution: ""
+      type: "",
+      laboratory: "",
+      documentUrl: "",
+      results: ""
     })
   }
 
-
-
-  //submit
-
+  // submit
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!selectedPatient) return;
@@ -92,17 +85,18 @@ const ConsultationForm = () => {
         ...formData
       }
 
-      await axios.post("http://localhost:3000/consults", dataToSave)
-      toast.success("Consulta cadastrada com sucesso!", {
+      await axios.post("http://localhost:3000/exams", dataToSave)
+
+      toast.success("Exame cadastrado com sucesso!", {
         autoClose: 3000,
         hideProgressBar: true
       })
 
       resetForm()
       handleCloseModal()
-    } catch (error) {
 
-      toast.error("Erro ao cadastrar consulta!", {
+    } catch (error) {
+      toast.error("Erro ao cadastrar exame!", {
         autoClose: 3000,
         hideProgressBar: true
       })
@@ -112,13 +106,13 @@ const ConsultationForm = () => {
   }
 
 
-
-
   return (
     <section className='p-6 text-gray-800'>
       {/* Campo de busca */}
       <div className='mb-6'>
-        <label htmlFor="name" className='block text-sm font-semibold mb-2'>Buscar paciente para cadastrar consulta</label>
+        <label htmlFor="name" className='block text-sm font-semibold mb-2'>
+          Buscar paciente para cadastrar exame
+        </label>
         <input
           id='name'
           type="text"
@@ -129,8 +123,7 @@ const ConsultationForm = () => {
         />
       </div>
 
-      {/* Lista de pacientes */}
-
+      {/* lista */}
       <ul className='space-y-3'>
         {filteredPatients.map((patient) => (
           <li
@@ -138,15 +131,9 @@ const ConsultationForm = () => {
             className='p-4 border rounded-lg shadow-sm flex justify-between items-center hover:bg-gray-50 transition'
           >
             <div>
-              <p className='text-sm'>
-                <strong>Registro: </strong>{patient.id}
-              </p>
-              <p className='text-sm'>
-                <strong>Nome: </strong>{patient.fullName}
-              </p>
-              <p className='text-sm'>
-                <strong>Convênio: </strong>{patient.healthInsurance}
-              </p>
+              <p className='text-sm'><strong>Registro: </strong>{patient.id}</p>
+              <p className='text-sm'><strong>Nome: </strong>{patient.fullName}</p>
+              <p className='text-sm'><strong>Convênio: </strong>{patient.healthInsurance}</p>
             </div>
             <button
               onClick={() => handleSelectPatient(patient)}
@@ -156,34 +143,31 @@ const ConsultationForm = () => {
         ))}
       </ul>
 
-      {/* modal de cadastro da consulta */}
-
+      {/* modal */}
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
         {selectedPatient && (
           <>
             <h2 className='text-lg font-bold mb-4 text-cyan-700'>
-              Cadastro consulta para {selectedPatient.fullName}
+              Cadastro de Exame para {selectedPatient.fullName}
             </h2>
-            {/* dados básicos */}
+
             <div className='mb-4 text-sm text-gray-700'>
-              <p>
-                <strong>Email: </strong>{selectedPatient.email}
-              </p>
-              <p>
-                <strong>Telefone: </strong>{selectedPatient.phone}
-              </p>
+              <p><strong>Email: </strong>{selectedPatient.email}</p>
+              <p><strong>Telefone: </strong>{selectedPatient.phone}</p>
             </div>
 
-
+            {/* form */}
             <form onSubmit={handleSubmit} className='space-y-4'>
+
               <div>
-                <label htmlFor="reason" className='block text-sm font-medium mb-1'>
-                  Motivo da Consulta: </label>
+                <label htmlFor="name" className='block text-sm font-medium mb-1'>
+                  Nome do Exame:
+                </label>
                 <input
                   type='text'
-                  name='reason'
-                  id='reason'
-                  value={formData.reason}
+                  name='name'
+                  id='name'
+                  value={formData.name}
                   onChange={handleInputChange}
                   required
                   className='w-full border p-2 rounded-lg focus:ring-cyan-600 outline-none'
@@ -193,7 +177,8 @@ const ConsultationForm = () => {
               <div className='grid grid-cols-2 gap-4'>
                 <div>
                   <label htmlFor="date" className='block text-sm font-medium mb-1'>
-                    Data: </label>
+                    Data:
+                  </label>
                   <input
                     type='date'
                     name='date'
@@ -204,9 +189,11 @@ const ConsultationForm = () => {
                     className='w-full border p-2 rounded-lg focus:ring-cyan-600 outline-none'
                   />
                 </div>
+
                 <div>
                   <label htmlFor="time" className='block text-sm font-medium mb-1'>
-                    Horário: </label>
+                    Horário:
+                  </label>
                   <input
                     type='time'
                     name='time'
@@ -220,27 +207,14 @@ const ConsultationForm = () => {
               </div>
 
               <div>
-                <label htmlFor="description" className='block text-sm font-medium mb-1'>
-                  Descrição do Problema: </label>
-                <textarea
-                  name='description'
-                  id='description'
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows='3'
-                  required
-                  className='w-full border p-2 rounded-lg focus:ring-cyan-600 outline-none'
-                />
-              </div>
-
-              <div>
-                <label htmlFor="medication" className='block text-sm font-medium mb-1'>
-                  Medicação receitada: </label>
+                <label htmlFor="type" className='block text-sm font-medium mb-1'>
+                  Tipo do Exame:
+                </label>
                 <input
                   type='text'
-                  name='medication'
-                  id='medication'
-                  value={formData.medication}
+                  name='type'
+                  id='type'
+                  value={formData.type}
                   onChange={handleInputChange}
                   required
                   className='w-full border p-2 rounded-lg focus:ring-cyan-600 outline-none'
@@ -248,12 +222,43 @@ const ConsultationForm = () => {
               </div>
 
               <div>
-                <label htmlFor="dosagemPrecaution" className='block text-sm font-medium mb-1'>
-                  Dosagem e Precauções: </label>
+                <label htmlFor="laboratory" className='block text-sm font-medium mb-1'>
+                  Laboratório:
+                </label>
+                <input
+                  type='text'
+                  name='laboratory'
+                  id='laboratory'
+                  value={formData.laboratory}
+                  onChange={handleInputChange}
+                  required
+                  className='w-full border p-2 rounded-lg focus:ring-cyan-600 outline-none'
+                />
+              </div>
+
+              <div>
+                <label htmlFor="documentUrl" className='block text-sm font-medium mb-1'>
+                  URL do Documento (PDF):
+                </label>
+                <input
+                  type='text'
+                  name='documentUrl'
+                  id='documentUrl'
+                  value={formData.documentUrl}
+                  onChange={handleInputChange}
+                  required
+                  className='w-full border p-2 rounded-lg focus:ring-cyan-600 outline-none'
+                />
+              </div>
+
+              <div>
+                <label htmlFor="results" className='block text-sm font-medium mb-1'>
+                  Resultados:
+                </label>
                 <textarea
-                  name='dosagemPrecaution'
-                  id='dosagemPrecaution'
-                  value={formData.dosagemPrecaution}
+                  name='results'
+                  id='results'
+                  value={formData.results}
                   onChange={handleInputChange}
                   rows='3'
                   required
@@ -269,21 +274,22 @@ const ConsultationForm = () => {
                   className='px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition cursor-pointer'
                 >Cancelar</button>
 
-
                 <button
                   type='submit'
                   disabled={isSaving}
                   className='px-4 py-2 bg-cyan-700 text-white rounded-lg hover:bg-cyan-600 disabled:opacity-50 transition cursor-pointer'
-                >{isSaving ? "Salvando..." : "Salvar"}</button>
+                >
+                  {isSaving ? "Salvando..." : "Salvar"}
+                </button>
               </div>
+
             </form>
           </>
         )}
       </Modal>
 
-
     </section>
   )
 }
 
-export default ConsultationForm
+export default ConsultationExam

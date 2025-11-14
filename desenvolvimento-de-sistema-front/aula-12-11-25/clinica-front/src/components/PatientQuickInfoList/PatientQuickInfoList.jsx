@@ -30,6 +30,8 @@ const PatientsList = () => {
         fetchPatients();
     }, []);
 
+    console.log("pacientes", patients)
+
     const calculateAge = (birthdate) => {
         if (!birthdate) return "-";
         const today = new Date();

@@ -160,6 +160,16 @@
       "medication": "benegrip",
       "dosagemPrecaution": "2 vezes ao dia",
       "id": "1"
+    },
+    {
+      "patientId": "3",
+      "reason": "Dor de Cabeça",
+      "date": "2025-11-27",
+      "time": "17:30",
+      "description": "Muita dor de cabeça",
+      "medication": "Dipirona",
+      "dosagemPrecaution": "1G 12 em 12 horas",
+      "id": "Do_V61G"
     }
   ],
   "exams": [
@@ -172,6 +182,17 @@
       "documentUrl": "site.com.br/exame.pdf",
       "results": "dados do exame",
       "id": "1"
+    },
+    {
+      "patientId": "1",
+      "name": "Ultrasom",
+      "date": "2025-11-26",
+      "time": "14:10",
+      "type": "Ultrasom",
+      "laboratory": "SantaLuzia",
+      "documentUrl": "https://meet.google.com/mse-zcpm-tqj?pli=1",
+      "results": "Limpo",
+      "id": "tCU2-vd"
     }
   ]
 }

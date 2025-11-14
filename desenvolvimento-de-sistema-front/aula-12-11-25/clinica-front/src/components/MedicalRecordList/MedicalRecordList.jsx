@@ -10,13 +10,14 @@ const MedicalRecordList = () => {
         try {
             const response = await axios.get("http://localhost:3000/patients");
             setPatients(response.data)
+
         } catch (error) {
             console.error("Erro ao obter os dados do paciente", error)
         }
     }
 
     useEffect(() => {
-
+        fetchPatients()
     }, [])
 
     const handleSearchChange = (event) => {
@@ -29,6 +30,8 @@ const MedicalRecordList = () => {
             patient.id.toString().includes(searchTerm)
         )
     })
+
+    // console.log("FILTROS", filteredPatients)
 
     return (
         <section className='p-6 bg-gray-50 rounded-lg shadow-md'>
@@ -58,8 +61,8 @@ const MedicalRecordList = () => {
                     filteredPatients.length > 0 ? (
                         filteredPatients.map((patient) => (
                             <li
-                            key={patient.id}
-                            className='p-4 bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow'>
+                                key={patient.id}
+                                className='p-4 bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow'>
                                 <p className='text-sm text-gray-700'>
                                     <strong className='text-gray-700'>Registro:</strong> {patient.id}
                                 </p>
@@ -69,14 +72,14 @@ const MedicalRecordList = () => {
                                 <p className='text-sm text-gray-700'>
                                     <strong className='text-gray-700'>Convênio:</strong> {patient.healthInsurance}
                                 </p>
-                                <link 
-                                to={`/paciente/${patient.id}`}
-                                className='inline-block mt-2 text-cyan-700 font-semibold hover:underline'
-                                >Ver detalhes                            
-                                </link>
+                                <Link
+                                    to={`/paciente/${patient.id}`}
+                                    className='inline-block mt-2 text-cyan-700 font-semibold hover:underline'
+                                >Ver detalhes
+                                </Link>
                             </li>
                         ))
-                    ):(
+                    ) : (
                         <p className='text-gray-600'>Nenhum paciente encontrado.</p>
                     )
                 }
