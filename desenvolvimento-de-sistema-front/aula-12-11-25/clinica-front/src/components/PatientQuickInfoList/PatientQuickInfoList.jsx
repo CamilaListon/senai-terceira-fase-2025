@@ -48,12 +48,28 @@ const PatientsList = () => {
         setSearchTerm(event.target.value);
     };
 
-    const filteredPatients = patients.filter((patient) =>
-        [patient.fullName, patient.email, patient.phone]
+    const filteredPatients = patients.filter((patient) => {
+        const combined = Object.values({
+            insuranceNumber: patient.insuranceNumber,
+            cpf: patient.cpf,
+            email: patient.email,
+            name: patient.fullName,
+            phone: patient.phone,
+            rg: patient.rg,
+            birthdate: patient.birthdate,
+            allergies: Array.isArray(patient.allergies) 
+                ? patient.allergies.join(" ") 
+                : patient.allergies
+        })
+            .filter(Boolean)
             .join(" ")
+            .toLowerCase();
+    
+        return searchTerm
             .toLowerCase()
-            .includes(searchTerm.toLowerCase())
-    );
+            .split(" ")
+            .every(term => combined.includes(term));
+    });
 
     return (
         <div className="bg-white shadow rounded-2xl p-6 mt-8">

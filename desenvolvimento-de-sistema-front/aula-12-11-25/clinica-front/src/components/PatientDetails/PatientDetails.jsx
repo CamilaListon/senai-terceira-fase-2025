@@ -3,12 +3,32 @@ import axios from 'axios'
 import { useParams } from 'react-router'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import PatientForm from "../PatientForm/PatientForm";
+
 const PatientDetails = () => {
   const { id } = useParams()
   const [patient, setPatient] = useState({})
   const [consults, setConsults] = useState([])
   const [exams, setExams] = useState([])
   const [editingConsult, setEditingConsult] = useState(null)
+  const [isEditingPatient, setIsEditingPatient] = useState(false);
+  const handleEditPatient = () => {
+    setIsEditingPatient(true);
+  };
+  
+  const handleSavePatient = async (updatedPatient) => {
+    try {
+      await axios.put(`http://localhost:3000/patients/${id}`, updatedPatient);
+      setPatient(updatedPatient);
+  
+      toast.success("Paciente atualizado com sucesso!");
+      setIsEditingPatient(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao atualizar paciente!");
+    }
+  };
+  
   const [editConsultData, setEditConsultData] = useState({
     reason: '',
     date: '',
@@ -138,13 +158,32 @@ const PatientDetails = () => {
   if (!patient) return <p>Carregando...</p>
   return (
     <section className="p-6 max-w-5xl mx-auto">
-      <div className="bg-white rounded-2xl shadow-md p-6 mb-8 border border-gray-100">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-2">{patient.fullName}</h2>
-        <p><span className="font-semibold">Convênio:</span>
-          {patient.healthInsurance}</p>
-        <p><span className="font-semibold">Alergias:</span>
-          {patient.allergies}</p>
-      </div>
+<div className="bg-white rounded-2xl shadow-md p-6 mb-8 border border-gray-100">
+  <h2 className="text-2xl font-semibold text-gray-800 mb-2">Dados do Paciente</h2>
+
+  {isEditingPatient ? (
+    <PatientForm
+      patient={patient}
+      onCancel={() => setIsEditingPatient(false)}
+      onSave={handleSavePatient}
+    />
+  ) : (
+    <>
+      <p><span className="font-semibold">Nome:</span> {patient.fullName}</p>
+      <p><span className="font-semibold">Convênio:</span> {patient.healthInsurance}</p>
+      <p><span className="font-semibold">Alergias:</span> {patient.allergies}</p>
+
+      <button
+        onClick={handleEditPatient}
+        className="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition"
+      >
+        Editar Cadastro
+      </button>
+    </>
+  )}
+</div>
+
+
       {/* Consultas */}
       <div className="bg-white rounded-2xl shadow-md p-6 mb-8 border border-gray-100">
         <h3 className="text-xl font-semibold text-gray-700 mb-4">Histórico de Consultas</h3>
